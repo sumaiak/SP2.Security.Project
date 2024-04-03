@@ -1,12 +1,12 @@
 package org.main;
 
+import org.main.handlers.UserHandler;
 import io.javalin.apibuilder.EndpointGroup;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
     }
 
 
@@ -24,17 +24,24 @@ public class Main {
     }
 
     public static EndpointGroup getUserRoutes() {
+        UserHandler userHandler = new UserHandler();
         return () -> {
             path("users", () -> {
-                get("/", ctx ->{});
-                get("/:id", ctx ->{});
-                post("/", ctx ->{});
-                put("/:id", ctx ->{});
-                delete("/:id", ctx ->{});
+                get(userHandler.getAllUsers());
 
+                post("/user",userHandler.create());
+
+                path("/user/{id}", () -> {
+                    get(userHandler.getById());
+
+                    put(userHandler.update());
+
+                    delete(userHandler.delete());
+                });
             });
         };
     }
+
 
     public static EndpointGroup getRegistrationRoutes() {
         return () -> {
