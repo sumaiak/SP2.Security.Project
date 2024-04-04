@@ -17,7 +17,8 @@ import java.util.Set;
 @Table(name = "events")
 public class Event {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     @Column(name = "title")
     private String title;
     @Column(name = "description")
@@ -46,7 +47,7 @@ public class Event {
     private LocalDateTime updatedAt;
     @Column(name = "deletedAt")
     private LocalDateTime deletedAt;
-  
+
     @ManyToMany(cascade = CascadeType.DETACH)
     Set<User>users = new HashSet<>();
 

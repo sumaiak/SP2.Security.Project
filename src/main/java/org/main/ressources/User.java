@@ -22,7 +22,6 @@ public class User {
     @Id
     private String email;
 
-
     @Column
     private String name;
 
@@ -37,7 +36,6 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "name"))
     //@JsonIgnore
     private Set<Role> roles = new HashSet<>();
-
 
     @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
     //@JsonIgnore
