@@ -1,24 +1,21 @@
 package org.main.config;
-
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.javalin.Javalin;
 import io.javalin.apibuilder.EndpointGroup;
 import io.javalin.http.HttpStatus;
-import org.main.security.ISecurityController;
-import org.main.dto.UserDTO;
 import org.main.exception.ApiException;
-import org.main.security.SecurityController;
+import org.main.dto.UserDTO;
+import org.main.handlers.ISecurityHandler;
+import org.main.handlers.SecurityHandler;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-
 public class ApplicationConfig {
     ObjectMapper om = new ObjectMapper();
-    ISecurityController securityController = new SecurityController();
+    ISecurityHandler securityHandler = new SecurityHandler();
     private Javalin app;
     private static ApplicationConfig instance;
     private ApplicationConfig(){}
@@ -36,6 +33,8 @@ public class ApplicationConfig {
 
         return instance;
     }
+
+
     public ApplicationConfig startServer(int port){
         app.start(port);
         return instance;
@@ -55,6 +54,8 @@ public class ApplicationConfig {
     public void stopServer(){
         app.stop();
     }
+
+
     public ApplicationConfig checkSecurityRoles() {
         // Check roles on the user (ctx.attribute("username") and compare with permittedRoles using securityController.authorize()
         app.updateConfig(config -> {
@@ -76,10 +77,10 @@ public class ApplicationConfig {
                             .json(om.createObjectNode()
                                     .put("msg","Not authorized. No username were added from the token"));
 
-                if (securityController.authorize(user, allowedRoles))
+                if (securityHandler.authorize(user, allowedRoles))
                     handler.handle(ctx);
                 else
-                    throw new ApiException(HttpStatus.FORBIDDEN.getCode(), "Unauthorized with roles: "+allowedRoles);
+                    throw new ApiException(HttpStatus.FORBIDDEN.getCode(), "Unauthorized with roles: " + allowedRoles);
             });
         });
         return instance;
@@ -99,4 +100,7 @@ public class ApplicationConfig {
             });
         }
         return hasAccess.get();
-    }}
+    }
+
+
+}

@@ -1,6 +1,5 @@
 package org.main.handlers;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Handler;
 

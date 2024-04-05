@@ -24,6 +24,7 @@ public class UserDTO {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.roles = user.getRolesAsStrings();
+        this.password = user.getPassword();
     }
     public UserDTO(String email, Set<String> rolesSet) {
         this.email = email;

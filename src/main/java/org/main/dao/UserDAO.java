@@ -1,44 +1,29 @@
 package org.main.dao;
 
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.TypedQuery;
-import org.main.ressources.Role;
 
+import org.main.exception.NotAuthorizedException;
+import org.main.ressources.Role;
 import org.main.ressources.User;
 
 import java.util.List;
 
-public class UserDAO {
-    EntityManagerFactory emf;
-    public UserDAO(EntityManagerFactory _emf)
-    {
+public class UserDAO  {
+    private EntityManagerFactory emf;
+    public UserDAO(EntityManagerFactory _emf) {
         this.emf = _emf;
     }
 
-    public User createUser(String name ,String email,String phone,String password) {
-        EntityManager em = emf.createEntityManager();
-        em.getTransaction().begin();
-        User user = new User(name,email,phone ,password);
-        Role userRole = em.find(Role.class, "user");
-        if (userRole == null) {
-            userRole = new Role("user");
-            em.persist(userRole);
+    public User create(User user) {
+        try (var em = emf.createEntityManager()) {
+            em.getTransaction().begin();
+            em.persist(user);
+            em.getTransaction().commit();
         }
-        user.addRole(userRole);
-        em.persist(user);
-        em.getTransaction().commit();
-        em.close();
-        return user;
-    }
-    public User verifyUser(String username, String password) throws EntityNotFoundException {
-        EntityManager em = emf.createEntityManager();
-        User user = em.find(User.class, username);//retrieve entity from DAtabase find is part from Hibernate framework
-        if (user == null)
-            throw new EntityNotFoundException("No user found with username: " + username);
-        if (!user.verifyUser(password))
-            throw new EntityNotFoundException("Wrong password");
         return user;
     }
   
@@ -81,5 +66,32 @@ public class UserDAO {
     }
 
 
-
+    public User createUser(String name, String email, String password, String phone) {
+        EntityManager em = emf.createEntityManager();
+        em.getTransaction().begin();
+        User user = new User(name, email, password, phone);
+        Role userRole = em.find(Role.class, "user");
+        if (userRole == null) {
+            userRole = new Role("user");
+            em.persist(userRole);
+        }
+        user.addRole(userRole);
+        em.persist(user);
+        em.getTransaction().commit();
+        em.close();
+        return user;
     }
+
+    public User verifyUser(String email, String password) throws EntityNotFoundException {
+        EntityManager em = emf.createEntityManager();
+        User user = em.find(User.class, email);
+        if (user == null)
+            throw new EntityNotFoundException("No user found with email: " + email);
+        if (!user.verifyUser(password))
+            throw new EntityNotFoundException("Wrong password");
+        return user;
+    }
+
+
+
+}
