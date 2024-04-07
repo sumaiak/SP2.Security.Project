@@ -1,6 +1,7 @@
 package org.main.handlers;
 
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nimbusds.jose.JOSEException;
@@ -21,6 +22,7 @@ import org.main.exception.ApiException;
 import org.main.exception.NotAuthorizedException;
 import org.main.ressources.User;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
@@ -67,6 +69,51 @@ public class SecurityHandler implements ISecurityHandler {
             }
         };
     }
+
+    @Override
+    public Handler resetPassword() {
+        return (ctx) -> {
+            ObjectNode returnObject = objectMapper.createObjectNode();
+            try {
+                // Extract the user from the context
+                UserDTO currentUser = ctx.attribute("user");
+                if (currentUser == null) {
+                    throw new ApiException(HttpStatus.UNAUTHORIZED.getCode(), "Unauthorized. User not found in session.");
+                }
+
+                // Parse the new password from the request
+                JsonNode requestBody = objectMapper.readTree(ctx.body());
+                String newPassword = requestBody.get("newPassword").asText();
+
+                // Update the user's password
+                securityDAO.updatePassword(currentUser.getEmail(), newPassword);
+
+                // Respond to the client
+                ctx.status(HttpStatus.OK);
+                returnObject.put("msg", "Password reset successfully.");
+                ctx.json(returnObject);
+            } catch (Exception e) {
+                ctx.status(HttpStatus.BAD_REQUEST);
+                returnObject.put("msg", e.getMessage());
+                ctx.json(returnObject);
+            }
+        };
+    }
+
+    @Override
+    public Handler logout() {
+        return ctx -> {
+            // Assuming previous middleware has verified the user and token validity
+            UserDTO currentUser = ctx.attribute("user");
+            if (currentUser == null) {
+                throw new ApiException(HttpStatus.UNAUTHORIZED.getCode(), "Unauthorized. User not found in session.");
+            }
+
+            // Inform the client to discard the token
+            ctx.status(HttpStatus.OK).json(objectMapper.createObjectNode().put("msg", "Logout successful. Discard token..."));
+        };
+    }
+
 
     @Override
     public String createToken(UserDTO user) {
