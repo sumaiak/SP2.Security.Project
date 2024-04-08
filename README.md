@@ -9,7 +9,7 @@ Sumaia El-Kalache, cph-se160@cphbusiness.dk , GitHub: sumaiak
 Mounir Salem, cph-ms848@cphbusiness.dk , GitHub: ETHMUNI
 
 ERD:
-![ERD](images/ERD.png)
+![ERD](images/eerd.png)
 
 
 
