@@ -17,26 +17,30 @@ import java.util.Set;
 
 @Table(name = "users")
 public class User {
-
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "id")
+    private Integer id;
 
-    @Column
+    @Column(name = "name")
     private String name;
 
-    @Id
-    @Column
+
+    @Column(name = "email" ,unique = true)
     private String email;
 
-    @Column
+    @Column(name = "phone")
     private String phone;
 
-    @Column
+    @Column(name = "password")
     private String password;
+
+
+
     @ManyToMany
     @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_email", referencedColumnName = "email"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "name"))
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
 

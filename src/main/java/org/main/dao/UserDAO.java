@@ -6,10 +6,8 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.TypedQuery;
 
-import org.main.exception.NotAuthorizedException;
 import org.main.ressources.Role;
 import org.main.ressources.User;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 
@@ -29,7 +27,7 @@ public class UserDAO  {
         }
         return user;
     }
-  
+
     public List<User> getAll() {
         try (var em = emf.createEntityManager()) {
             TypedQuery<User> q = em.createQuery("select u FROM User  u", User.class);
@@ -40,7 +38,7 @@ public class UserDAO  {
         }
     }
 
-    public User getById(String email) {
+    public User getByEmail(String email) {
         try (var em = emf.createEntityManager()) {
             TypedQuery<User> q = em.createQuery("FROM User h WHERE h.email = :email", User.class);
             q.setParameter("email", email);
@@ -73,10 +71,15 @@ public class UserDAO  {
         EntityManager em = emf.createEntityManager();
         em.getTransaction().begin();
         User user = new User(name, email, password, phone);
-        Role userRole = em.find(Role.class, "user");
-        if (userRole == null) {
+        TypedQuery<Role> query = em.createQuery("SELECT r FROM Role r WHERE r.name = :name", Role.class);
+        query.setParameter("name", "user");
+        List<Role> roles = query.getResultList();
+        Role userRole;
+        if (roles.isEmpty()) {
             userRole = new Role("user");
             em.persist(userRole);
+        } else {
+            userRole = roles.get(0);
         }
         user.addRole(userRole);
         em.persist(user);
@@ -87,13 +90,21 @@ public class UserDAO  {
 
     public User verifyUser(String email, String password) throws EntityNotFoundException {
         EntityManager em = emf.createEntityManager();
-        User user = em.find(User.class, email);
+        TypedQuery<User> q = em.createQuery("FROM User u WHERE u.email = :email", User.class);
+        q.setParameter("email", email);
+        User user = q.getSingleResult();
         if (user == null)
             throw new EntityNotFoundException("No user found with email: " + email);
         if (!user.verifyUser(password))
             throw new EntityNotFoundException("Wrong password");
         return user;
     }
+
+
+
+
+
+
 
     public void updatePassword(String email, String newPassword) {
         EntityManager em = getEntityManagerFactory().createEntityManager();
