@@ -97,5 +97,4 @@ public class Routes {
 
     public enum Role implements RouteRole { ANYONE, USER, ADMIN}
 
-
 }
