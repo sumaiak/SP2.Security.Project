@@ -74,6 +74,7 @@ public class HibernateConfig {
     private static String getDBName() {
         return Utils.getPropertyValue("db.name", "properties-from-pom.properties");
     }
+
     private static Properties setBaseProperties(Properties props){
         props.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         props.put("hibernate.connection.driver_class", "org.postgresql.Driver");
@@ -86,9 +87,9 @@ public class HibernateConfig {
     }
 
     private static Properties setDeployedProperties(Properties props){
-        props.setProperty("hibernate.connection.url", System.getenv("CONNECTION_STR") + getDBName());
-        props.setProperty("hibernate.connection.username", System.getenv("DB_USERNAME"));
-        props.setProperty("hibernate.connection.password", System.getenv("DB_PASSWORD"));
+        props.put("hibernate.connection.url", System.getenv("CONNECTION_STR") + System.getenv("DB_NAME"));
+        props.put("hibernate.connection.username", System.getenv("DB_USERNAME"));
+        props.put("hibernate.connection.password", System.getenv("DB_PASSWORD"));
         return props;
     }
     private static Properties setDevProperties(Properties props){

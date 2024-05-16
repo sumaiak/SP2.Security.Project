@@ -5,9 +5,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.persistence.EntityManagerFactory;
 import org.main.config.HibernateConfig;
 import org.main.config.ApplicationConfig;
-import org.main.routes.Routes;
 
-import static org.main.routes.Routes.*;
+import static org.main.Routes.Routes.*;
+
 
 public class Main {
 
